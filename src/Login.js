@@ -8,15 +8,10 @@ function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const navigate = useNavigate()
-    useEffect(() => {
-        if (localStorage.getItem('user-info')) {
-            navigate("/dashboard")
-        }
-    }, [])
+ 
     async function login() {
         try {
             let item = { email, password }
-
             let result = await fetch(`${apiUrl}/user/login`, {
                 method: 'POST',
                 headers: {
@@ -30,59 +25,25 @@ function Login() {
                 Swal.fire({
                     position: 'center',
                     icon: 'success',
-                    title: 'Berhasil login',
+                    title: 'Login Success',
                     showConfirmButton: false,
                     timer: 1500
                 })
-                localStorage.setItem("user-info", JSON.stringify(result))
-                navigate("/dashboard")
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Berhasil login',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-
-            } else if (result.message == "\"email\" must be a valid email" 
-                        || result.message == "\"email\" is not allowed to be empty") {
+                // localStorage.setItem("user-info", JSON.stringify(result))
+                // navigate("/dashboard")
+            } else if (result.message == "email or password wrong") {
                 Swal.fire({
                     position: 'center',
                     icon: 'warning',
-                    title: 'Tolong masukan alamat email yang valid',
+                    title: 'Email or Password Wrong!',
                     showConfirmButton: false,
                     timer: 1500
                 })
-            } else if (result.message == "User not found") {
+            } else {
                 Swal.fire({
                     position: 'center',
                     icon: 'warning',
-                    title: 'Email belum terdaftar',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            } else if (result.message == "\"password\" length must be at least 6 characters long" 
-                        || result.message == "\"password\" is not allowed to be empty") {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'warning',
-                    title: 'Password tidak valid',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            } else if (result.message == "Email and password does not match") {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'warning',
-                    title: 'Email dan password tidak cocok',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            } else if (result.message == "Too many request, try again later") {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'warning',
-                    title: 'Terlalu banyak kesalahan login, coba lagi nanti',
+                    title: 'Error',
                     showConfirmButton: false,
                     timer: 1500
                 })
@@ -90,13 +51,11 @@ function Login() {
         } catch (error) {
             console.error('Error logging in user:', error);
         }
-
     }
     return (
         <div>
             <Header />
             <div className="col-sm-6 offset-sm-3 align-items-center mx-auto" >
-
                 <div style={{ margin: '20px' }}>
                     <h1>Halaman Login</h1>
                     <br />
@@ -109,8 +68,6 @@ function Login() {
                     <br />
                     <Link to="/register"><button className="btn btn-warning" style={{ width: '6rem' }}>Register</button></Link>
                 </div>
-
-
             </div>
         </div>
     )

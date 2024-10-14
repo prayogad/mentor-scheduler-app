@@ -1,17 +1,20 @@
 import Header from "./Header"
 import React, { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+    const apiUrl = process.env.REACT_APP_API_URL;
     const [dashboardData, setDashboardData] = useState([]);
-
+    const navigate = useNavigate()
     useEffect(() => {
         fetchDashboard();
     }, []);
 
     async function fetchDashboard() {
-        const uid = JSON.parse(localStorage.getItem('user-info')).data.uid;
+        const uid = JSON.parse(localStorage.getItem('user-info')).data.id;
         try {
-            let result = await fetch(`/users/dashboard/${uid}`, {
+            let result = await fetch(`${apiUrl}/user/api/dashboard`, {
                 headers: {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
@@ -20,9 +23,8 @@ function Dashboard() {
             result = await result.json();
             if (result.success && Array.isArray(result.data)) {
                 setDashboardData(result.data);
-            } else {
-                console.log('Data returned from API is not an array');
-            }
+            } 
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -40,15 +42,9 @@ function Dashboard() {
                         <div className="col my-2">
                             <div className="card mx-2">
                                 <div className="card-body text-start">
-                                    <h5 className="card-title">Tanggal: {item.date}</h5>
-                                    <p className="card-text">Waktu: {item.time}</p>
-                                    <p className="card-text">
-                                        {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
-                                            `Nama Murid: ${item.namaMurid}`
-                                            :
-                                            `Nama Mentor: ${item.namaMentor}`
-                                        }
-                                    </p>
+                                    <h5 className="card-title">Tanggal: {item.data.scheduledAt}</h5>
+                                    <p className="card-text">Nama Murid: ${item.data.student_name}</p>
+                                    <p className="card-text">Nama Mentor: ${item.data.mentor_name}`</p>
                                     <p className="card-text">
                                         {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
                                             `Email Murid: ${item.emailMurid}`
@@ -75,7 +71,7 @@ function Dashboard() {
                         </div>
                     ))
                 ) : (
-                    <p>Belum ada perjanjian mentoring</p>
+                    <p>Dashboard Empty</p>
                 )}
             </div>
         </div>

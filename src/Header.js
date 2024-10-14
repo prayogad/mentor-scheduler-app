@@ -2,8 +2,9 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 function Header() {
     let user = JSON.parse(localStorage.getItem('user-info'))
@@ -32,9 +33,9 @@ function Header() {
                             navbarScroll
                         >
                             {
-                                localStorage.getItem('user-info') ?
+                                Cookies.get('auth') && localStorage.getItem('user-info') ?
                                     (
-                                        JSON.parse(localStorage.getItem('user-info')).data.posisi === "mentor" ?
+                                        JSON.parse(localStorage.getItem('user-info')).data.role === "mentor" ?
                                             (
                                                 <>
                                                     <Link to="/add" class='navv'>Jadwal</Link>
@@ -59,14 +60,11 @@ function Header() {
                             }
                         </Nav>
 
-                        {localStorage.getItem('user-info') ?
+                        {Cookies.get('auth') && localStorage.getItem('user-info') ?
 
                             <Nav style={{ marginRight: '1.5rem' }}>
                                 <NavDropdown title={user && user.data.username}>
                                     <NavDropdown.Item><Link to="/profile" style={{ color:'inherit', textDecoration:'none', display: 'block'}}>Profile</Link></NavDropdown.Item>
-                                    
-
-
                                     <NavDropdown.Item onClick={logOut}>Logout</NavDropdown.Item>
                                 </NavDropdown>
                             </Nav>

@@ -18,11 +18,20 @@ function App() {
           <Route path='/' element={<Login />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
-          <Route path='/add' element={<AddSchedule />} />
-          <Route path='/mentor' element={<ListMentor />} />
-          <Route path='/mentor/:uid' element={<MentorDetail />} />
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/profile' element={<Profile />} />
+          {/* <Route path='/add' element={<AddSchedule />} /> */}
+          <Route path='/add' element={<Protected  Cmp={AddSchedule} />} />
+
+          {/* <Route path='/mentor' element={<ListMentor />} /> */}
+          <Route path='/mentor' element={<Protected  Cmp={ListMentor} />} />
+
+          {/* <Route path='/mentor/:uid' element={<MentorDetail />} /> */}
+          <Route path='/mentor/:uid' element={<Protected  Cmp={MentorDetail} />} />
+
+          {/* <Route path='/dashboard' element={<Dashboard />} /> */}
+          <Route path='/dashboard' element={<Protected  Cmp={Dashboard} />} />
+
+          {/* <Route path='/profile' element={<Profile />} /> */}
+          <Route path='/profile' element={<Protected  Cmp={Profile} />} />
 
           {/* <Route path='/profile' element={<Protected  Cmp={Profile} />} /> */}
         </Routes>

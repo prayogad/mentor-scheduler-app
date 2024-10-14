@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function Protected(props) {
     const navigate = useNavigate();
@@ -8,7 +9,7 @@ function Protected(props) {
 
     useEffect(() => {
         let isMounted = true; // add flag
-        if (!localStorage.getItem('user-info')) {
+        if (false) {
             navigate("/login");
         } else {
             if (isMounted) setIsLoggedIn(true); 
