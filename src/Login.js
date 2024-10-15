@@ -1,9 +1,15 @@
-import Header from "./Header"
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
+import Header from "./Header";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 function Login() {
+    useEffect(() => {
+        if (localStorage.getItem('user-info') && Cookies.get('auth')) {
+            navigate("/dashboard")
+        }
+    }, []) 
     const apiUrl = process.env.REACT_APP_API_URL;
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -18,7 +24,8 @@ function Login() {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
                 },
-                body: JSON.stringify(item)
+                body: JSON.stringify(item),
+                credentials: 'include'
             })
             result = await result.json();
             if (result.success) {
@@ -29,8 +36,8 @@ function Login() {
                     showConfirmButton: false,
                     timer: 1500
                 })
-                // localStorage.setItem("user-info", JSON.stringify(result))
-                // navigate("/dashboard")
+                localStorage.setItem("user-info", JSON.stringify(result))
+                navigate("/dashboard")
             } else if (result.message == "email or password wrong") {
                 Swal.fire({
                     position: 'center',

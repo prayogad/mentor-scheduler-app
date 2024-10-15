@@ -9,7 +9,7 @@ function Protected(props) {
 
     useEffect(() => {
         let isMounted = true; // add flag
-        if (false) {
+        if (!Cookies.get('auth')) {
             navigate("/login");
         } else {
             if (isMounted) setIsLoggedIn(true); 

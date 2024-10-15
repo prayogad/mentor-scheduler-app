@@ -18,7 +18,8 @@ function Dashboard() {
                 headers: {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
-                }
+                },
+                credentials: 'include'
             });
             result = await result.json();
             if (result.success && Array.isArray(result.data)) {
@@ -42,30 +43,10 @@ function Dashboard() {
                         <div className="col my-2">
                             <div className="card mx-2">
                                 <div className="card-body text-start">
-                                    <h5 className="card-title">Tanggal: {item.data.scheduledAt}</h5>
-                                    <p className="card-text">Nama Murid: ${item.data.student_name}</p>
-                                    <p className="card-text">Nama Mentor: ${item.data.mentor_name}`</p>
-                                    <p className="card-text">
-                                        {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
-                                            `Email Murid: ${item.emailMurid}`
-                                            :
-                                            `Email Mentor: ${item.emailMentor}`
-                                        }
-                                    </p>
-                                    <p className="card-text">
-                                        {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
-                                            `Nomor Telepon Murid: +${item.phoneMurid}`
-                                            :
-                                            `Nomor Telepon Mentor: +${item.phoneMentor}`
-                                        }
-                                    </p>
-                                    <p className="card-text">
-                                        {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
-                                            null
-                                            :
-                                            `Bidang Mentor: ${item.bidangMentor}`
-                                        }
-                                    </p>
+                                    <h5 className="card-title">Tanggal: {item.scheduledAt}</h5>
+                                    <p className="card-text">Nama Murid: {item.student_name}</p>
+                                    <p className="card-text">Nama Mentor: {item.mentor_name}</p>
+                                    <p className="card-text">Field: {item.field}</p>
                                 </div>
                             </div>
                         </div>
