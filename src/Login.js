@@ -6,15 +6,15 @@ import Cookies from 'js-cookie';
 
 function Login() {
     useEffect(() => {
-        if (localStorage.getItem('user-info') && Cookies.get('auth')) {
+        if (localStorage.getItem('user-info') && Cookies.get('refreshToken')) {
             navigate("/dashboard")
         }
-    }, []) 
+    }, [])
     const apiUrl = process.env.REACT_APP_API_URL;
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const navigate = useNavigate()
- 
+
     async function login() {
         try {
             let item = { email, password }
@@ -36,7 +36,9 @@ function Login() {
                     showConfirmButton: false,
                     timer: 1500
                 })
-                localStorage.setItem("user-info", JSON.stringify(result))
+                const expirationTime = Date.now() + (15 * 60 * 1000)
+                localStorage.setItem("user-info", JSON.stringify(result.data))
+                localStorage.setItem('expirationTime', expirationTime);
                 navigate("/dashboard")
             } else if (result.message == "email or password wrong") {
                 Swal.fire({

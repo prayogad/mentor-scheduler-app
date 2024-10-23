@@ -7,19 +7,38 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 
 function Header() {
-    let user = JSON.parse(localStorage.getItem('user-info'))
+    let user = JSON.parse(localStorage.getItem('user-info'));
+    const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
-    function logOut() {
-        localStorage.clear()
-        navigate("/login")
-        Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: 'Berhasil Logout',
-            showConfirmButton: false,
-            timer: 1600
-        })
+    let accessToken;
+    if (localStorage.getItem('user-info')) {
+        accessToken = JSON.parse(localStorage.getItem('user-info')).access_token;
     }
+
+    async function logOut() {
+        let result = await fetch(`${apiUrl}/user/api/logout`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": 'application/json',
+                "Accept": 'application/json',
+                "Authorization": accessToken
+            },
+            credentials: 'include'
+        })
+        result = await result.json();
+        if (result.success) {
+            localStorage.clear()
+            navigate("/login")
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Berhasil Logout',
+                showConfirmButton: false,
+                timer: 1600
+            })
+        }
+    }
+
     return (
         <div>
             <Navbar expand="lg" className="bg-body-tertiary">
@@ -33,9 +52,9 @@ function Header() {
                             navbarScroll
                         >
                             {
-                                Cookies.get('auth') && localStorage.getItem('user-info') ?
+                                Cookies.get('refreshToken') && localStorage.getItem('user-info') ?
                                     (
-                                        JSON.parse(localStorage.getItem('user-info')).data.role === "mentor" ?
+                                        JSON.parse(localStorage.getItem('user-info')).role === "mentor" ?
                                             (
                                                 <>
                                                     <Link to="/add" class='navv'>Jadwal</Link>
@@ -60,11 +79,11 @@ function Header() {
                             }
                         </Nav>
 
-                        {Cookies.get('auth') && localStorage.getItem('user-info') ?
+                        {Cookies.get('refreshToken') && localStorage.getItem('user-info') ?
 
                             <Nav style={{ marginRight: '1.5rem' }}>
-                                <NavDropdown title={user && user.data.username}>
-                                    <NavDropdown.Item><Link to="/profile" style={{ color:'inherit', textDecoration:'none', display: 'block'}}>Profile</Link></NavDropdown.Item>
+                                <NavDropdown title={user && user.name}>
+                                    <NavDropdown.Item><Link to="/profile" style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}>Profile</Link></NavDropdown.Item>
                                     <NavDropdown.Item onClick={logOut}>Logout</NavDropdown.Item>
                                 </NavDropdown>
                             </Nav>

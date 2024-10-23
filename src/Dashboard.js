@@ -12,12 +12,14 @@ function Dashboard() {
     }, []);
 
     async function fetchDashboard() {
-        const uid = JSON.parse(localStorage.getItem('user-info')).data.id;
+        const uid = JSON.parse(localStorage.getItem('user-info')).id;
+        const accessToken = JSON.parse(localStorage.getItem('user-info')).access_token;
         try {
             let result = await fetch(`${apiUrl}/user/api/dashboard`, {
                 headers: {
                     "Content-Type": 'application/json',
-                    "Accept": 'application/json'
+                    "Accept": 'application/json',
+                    "Authorization": accessToken
                 },
                 credentials: 'include'
             });
@@ -43,7 +45,7 @@ function Dashboard() {
                         <div className="col my-2">
                             <div className="card mx-2">
                                 <div className="card-body text-start">
-                                    <h5 className="card-title">Tanggal: {item.scheduledAt}</h5>
+                                    <h5 className="card-title">Tanggal: {new Date(item.scheduledAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}</h5>
                                     <p className="card-text">Nama Murid: {item.student_name}</p>
                                     <p className="card-text">Nama Mentor: {item.mentor_name}</p>
                                     <p className="card-text">Field: {item.field}</p>

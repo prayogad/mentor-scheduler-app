@@ -5,21 +5,29 @@ import Swal from 'sweetalert2'
 import { InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 
 function AddSchedule() {
+    const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate()
+    
     useEffect(() => {
-        if (JSON.parse(localStorage.getItem('user-info')).data.posisi === "mentor") {
+        if (JSON.parse(localStorage.getItem('user-info')).role === "mentor") {
             navigate("/add")
-        } else if (JSON.parse(localStorage.getItem('user-info')).data.posisi === "murid") {
+        } else if (JSON.parse(localStorage.getItem('user-info')).posisi === "murid") {
             navigate("/mentor")
         }
     }, [])
 
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, -8);  // Remove seconds and milliseconds
+    };
+
     const [kuota, setKuota] = useState("");
-    const [date, setDate] = useState("Date.now()");
-    const [dropdownValue1, setDropdownValue1] = useState("8");
-    const [dropdownValue2, setDropdownValue2] = useState("AM");
-    const [calorieHistory, setCalorieHistory] = useState([]);
-    let uid = JSON.parse(localStorage.getItem('user-info')).data.uid;
+    const [date, setDate] = useState(getCurrentDateTime());
+    const [mentorSchedule, setMentorSchedule] = useState([]);
+    let uid = JSON.parse(localStorage.getItem('user-info')).id;
+    const accessToken = JSON.parse(localStorage.getItem('user-info')).access_token;
 
     useEffect(() => {
         fetchSchedule();
@@ -37,13 +45,15 @@ function AddSchedule() {
     }, []);
 
     async function addSchedule() {
-        let item = { time: `${dropdownValue1} ${dropdownValue2}`, date, kuota };
-        let result = await fetch(`/users/${uid}/schedule`, {
+        let item = { scheduledAt: date, quota: Number(kuota) };
+        let result = await fetch(`${apiUrl}/session/api/addSession`, {
             method: 'POST',
             headers: {
                 "Content-Type": 'application/json',
-                "Accept": 'application/json'
+                "Accept": 'application/json',
+                "Authorization": accessToken
             },
+            credentials: 'include',
             body: JSON.stringify(item)
         });
         result = await result.json();
@@ -68,7 +78,7 @@ function AddSchedule() {
     }
     async function fetchSchedule() {
         try {
-            let result = await fetch(`/users/${uid}/schedule`, {
+            let result = await fetch(`${apiUrl}/session/getSession/${uid}`, {
                 headers: {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
@@ -76,9 +86,9 @@ function AddSchedule() {
             });
             result = await result.json();
             if (Array.isArray(result.data)) {
-                setCalorieHistory(result.data);
+                setMentorSchedule(result.data);
             } else {
-                console.log('Data returned from API is not an array');
+                console.error('Data returned from API is not an array');
             }
 
         } catch (error) {
@@ -86,13 +96,15 @@ function AddSchedule() {
         }
     }
 
-    async function deleteProduct(docId) {
-        let result = await fetch(`/users/${uid}/jadwal/${docId}`, {
+    async function deleteSchedule(docId) {
+        let result = await fetch(`${apiUrl}/session/api/deleteSession/${docId}`, {
             method: 'DELETE',
             headers: {
                 "Content-Type": 'application/json',
-                "Accept": 'application/json'
+                "Accept": 'application/json',
+                "Authorization": accessToken
             },
+            credentials: 'include',
         });
 
         result = await result.json();
@@ -102,7 +114,7 @@ function AddSchedule() {
             Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: 'Jadwal berhasil dihapus',
+                title: 'Schedule Deleted Successfully',
                 showConfirmButton: false,
                 timer: 1600
             })
@@ -110,6 +122,7 @@ function AddSchedule() {
             console.error("Failed to delete product", result);
         }
     }
+    
     return (
         <div>
             <Header />
@@ -117,37 +130,16 @@ function AddSchedule() {
             <div className="align-items-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <h1>Ketersediaan Jadwal</h1>
 
-                <InputGroup style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: "2rem" }}>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ marginRight: '1rem', maxWidth: '200px' }} className="form-control" />
-                    <DropdownButton
-
-                        variant="info"
-                        title={dropdownValue1}
-                        id="input-group-dropdown-1"
-                    >
-                        <Dropdown.Item onClick={() => setDropdownValue1('1')}>1</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('2')}>2</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('3')}>3</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('4')}>4</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('5')}>5</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('6')}>6</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('7')}>7</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('8')}>8</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('9')}>9</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('10')}>10</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('11')}>11</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue1('12')}>12</Dropdown.Item>
-                    </DropdownButton>
-                    <DropdownButton
-
-                        variant="outline-primary"
-                        title={dropdownValue2}
-                        id="input-group-dropdown-2"
-                    >
-                        <Dropdown.Item onClick={() => setDropdownValue2('AM')}>AM</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setDropdownValue2('PM')}>PM</Dropdown.Item>
-                    </DropdownButton>
-                </InputGroup>
+                <input
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    style={{ marginRight: '1rem', maxWidth: '200px', marginTop: "2rem" }} 
+                    className="form-control"
+                    type="datetime-local"
+                    name="date"
+                    // defaultValue={getCurrentDateTime()}
+                />
+    
                 <br />
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', maxWidth: '900px' }}>
                     <input type="number" value={kuota} onChange={(e) => setKuota(e.target.value)} placeholder="Kuota" style={{ maxWidth: '900px', marginTop: "1rem" }} className="form-control" />
@@ -158,15 +150,15 @@ function AddSchedule() {
 
             </div>
             <div className="row align-items-center " style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                {calorieHistory.length > 0 ? (
-                    calorieHistory.map((item) => (
+                {mentorSchedule.length > 0 ? (
+                    mentorSchedule.map((item) => (
                         <div className="col-12 col-sm-6 col-md-4 col-lg-3 my-4">
-                            <div className="card mx-auto" style={{ width: '18rem' }}>
+                            <div className="card mx-auto" style={{ width: '18rem', height: '180px' }}>
                                 <div className="card-body">
-                                    <h5 className="card-title">Tanggal: {item.date}</h5>
-                                    <p className="card-text">Waktu: {item.time}</p>
-                                    <p className="card-text">Kuota: {item.kuota}</p>
-                                    <button className="btn btn-danger" onClick={() => deleteProduct(item.docId)}>Hapus</button>
+                                    <h5 className="card-title">Waktu:</h5>
+                                    <h5 className="card-title">{new Date(item.scheduledAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}</h5>
+                                    <p className="card-text">Kuota: {item.quota}</p>
+                                    <button className="btn btn-danger" onClick={() => deleteSchedule(item.id)}>Hapus</button>
                                 </div>
                             </div>
                         </div>
@@ -174,7 +166,7 @@ function AddSchedule() {
                 ) : (
                     <div style={{ marginTop: '100px' }}>
                         <div className="">
-                            <p className="">Jadwal Belum Dipilih</p>
+                            <p className="">Jadwal Belum Dimasukkan</p>
                         </div>
                     </div>
                 )}

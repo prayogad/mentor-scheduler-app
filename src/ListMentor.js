@@ -3,16 +3,16 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
 function ListMentor() {
-
+    const apiUrl = process.env.REACT_APP_API_URL;
     const [mentors, setMentors] = useState([]);
     const navigate = useNavigate()
-    useEffect(() => {
-        if (JSON.parse(localStorage.getItem('user-info')).data.posisi === "mentor") {
-            navigate("/add")
-        } else if (JSON.parse(localStorage.getItem('user-info')).data.posisi === "murid") {
-            navigate("/mentor")
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (JSON.parse(localStorage.getItem('user-info')).role === "mentor") {
+    //         navigate("/add")
+    //     } else if (JSON.parse(localStorage.getItem('user-info')).role === "student") {
+    //         navigate("/mentor")
+    //     }
+    // }, [])
 
     useEffect(() => {
         fetchMentors();
@@ -20,7 +20,7 @@ function ListMentor() {
 
     async function fetchMentors() {
         try {
-            let result = await fetch(`/users/mentors`, {
+            let result = await fetch(`${apiUrl}/mentor`, {
                 headers: {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
@@ -51,8 +51,8 @@ function ListMentor() {
                                 <div className="card mx-auto" style={{ width: '15rem' }}>
                                     <img className="card-img-top" src={mentor.picture} alt="Card image cap" />
                                     <div className="card-body">
-                                        <h5 className="card-title">{mentor.username}</h5>
-                                        <p className="card-text">Bidang: {mentor.bidang}</p>
+                                        <h5 className="card-title">{mentor.name}</h5>
+                                        <p className="card-text">Bidang: {mentor.field}</p>
                                         <p className="card-text">Email: {mentor.email}</p>
                                         <p className="card-text">Phone: +{mentor.phone}</p>
                                     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Header from './Header'
 
 function Profile() {
+    const apiUrl = process.env.REACT_APP_API_URL;
     const [userData, setUserDetail] = useState({});
 
     useEffect(() => {
@@ -9,22 +10,29 @@ function Profile() {
     }, []);
 
     async function fetchUserProfile() {
-        const uid = JSON.parse(localStorage.getItem('user-info')).data.uid;
+        // const uid = JSON.parse(localStorage.getItem('user-info')).id;
+        const accessToken = JSON.parse(localStorage.getItem('user-info')).access_token;
 
         try {
-            let result = await fetch(`/user/${uid}`, {
+            let result = await fetch(`${apiUrl}/user/api/current`, {
                 headers: {
                     "Content-Type": 'application/json',
-                    "Accept": 'application/json'
-                }
+                    "Accept": 'application/json',
+                    "Authorization": accessToken
+                },
+                credentials: 'include'
             });
             result = await result.json();
-            setUserDetail(result.data);
-            fetchUserProfile();
+
+            if (result.success && result.data) {
+                setUserDetail(result.data);
+            }
+
+            
+            // fetchUserProfile();
 
         } catch (error) {
             console.warn("Error fetching user data", error);
-
         }
     }
     return (
@@ -40,10 +48,12 @@ function Profile() {
                             <p>Nama: {userData.name}</p>
                             <p>Email: {userData.email}</p>
                             <p>Nomor Telepon: +{userData.phone}</p>
-                            <p>Status: {userData.status}</p>
-                            {JSON.parse(localStorage.getItem('user-info')).data.posisi === 'mentor' ?
-
-                                <p>Bidang: {userData.bidang}</p>
+                            <p>Role: {userData.role}</p>
+                            {JSON.parse(localStorage.getItem('user-info')).role === 'mentor' ?
+                                <>
+                                <p>Bidang: {userData.field}</p>
+                                <p>Bio: {userData.bio}</p>
+                                </>
                                 :
                                 null
                             }
