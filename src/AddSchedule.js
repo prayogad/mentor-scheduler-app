@@ -57,6 +57,8 @@ function AddSchedule() {
             body: JSON.stringify(item)
         });
         result = await result.json();
+        const message = result.message.map(value => value.message)
+        console.warn(message)
         if (result.success) {
             fetchSchedule();
             Swal.fire({
@@ -66,11 +68,27 @@ function AddSchedule() {
                 showConfirmButton: false,
                 timer: 1600
             })
-        } else if (result.message === "\"kuota\" must be a number" || result.message === "\"kuota\" must be a positive number") {
+        } else if (message[0] === "scheduled time cannot in the past") {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Kuota belum dimasukan',
+                title: 'Scheduled Time Be Cannot In The Past',
+                showConfirmButton: false,
+                timer: 1600
+            })
+        } else if (message[0] === "Number must be greater than or equal to 1") {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Quota Cannot Be Less Than 1',
+                showConfirmButton: false,
+                timer: 1600
+            })
+        } else {
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Something Wrong, Please Try Again Later!',
                 showConfirmButton: false,
                 timer: 1600
             })

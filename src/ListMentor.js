@@ -47,7 +47,7 @@ function ListMentor() {
                 {mentors.length > 0 ? (
                     mentors.map((mentor) => (
                         <div className="col-12 col-sm-6 col-md-4 col-lg-3 my-4">
-                            <Link to={`/mentor/${mentor.uid}`} style={{ textDecoration: 'none' }}>
+                            <Link to={`/mentor/${mentor.id}`} style={{ textDecoration: 'none' }}>
                                 <div className="card mx-auto" style={{ width: '15rem' }}>
                                     <img className="card-img-top" src={mentor.picture} alt="Card image cap" />
                                     <div className="card-body">
