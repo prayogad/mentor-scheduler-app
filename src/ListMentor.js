@@ -1,18 +1,10 @@
 import Header from "./Header"
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 function ListMentor() {
     const apiUrl = process.env.REACT_APP_API_URL;
     const [mentors, setMentors] = useState([]);
-    const navigate = useNavigate()
-    // useEffect(() => {
-    //     if (JSON.parse(localStorage.getItem('user-info')).role === "mentor") {
-    //         navigate("/add")
-    //     } else if (JSON.parse(localStorage.getItem('user-info')).role === "student") {
-    //         navigate("/mentor")
-    //     }
-    // }, [])
 
     useEffect(() => {
         fetchMentors();
@@ -30,7 +22,7 @@ function ListMentor() {
             if (Array.isArray(result.data)) {
                 setMentors(result.data);
             } else {
-                console.log('Data returned from API is not an array');
+                console.error('Data returned from API is not an array');
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -52,7 +44,7 @@ function ListMentor() {
                                     <img className="card-img-top" src={mentor.picture} alt="Card image cap" />
                                     <div className="card-body">
                                         <h5 className="card-title">{mentor.name}</h5>
-                                        <p className="card-text">Bidang: {mentor.field}</p>
+                                        <p className="card-text">Field: {mentor.field}</p>
                                         <p className="card-text">Email: {mentor.email}</p>
                                         <p className="card-text">Phone: +{mentor.phone}</p>
                                     </div>

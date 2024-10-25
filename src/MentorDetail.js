@@ -7,6 +7,7 @@ function MentorDetail() {
     const { uid } = useParams();
     const [mentorDetail, setMentorDetail] = useState({});
     const [schedule, setSchedule] = useState([]);
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         fetchMentorDetail();
@@ -15,7 +16,7 @@ function MentorDetail() {
     async function fetchMentorDetail() {
         try {
 
-            let result = await fetch(`/users/${uid}`, {
+            let result = await fetch(`${apiUrl}/mentor/${uid}`, {
                 headers: {
                     "Content-Type": 'application/json',
                     "Accept": 'application/json'
@@ -23,27 +24,28 @@ function MentorDetail() {
             });
             result = await result.json();
             setMentorDetail(result.data);
-            setSchedule(result.data.jadwal.filter(item => item.date && item.time));
+            setSchedule(result.data.schedule.filter(item => item.scheduleAt || item.quota));
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     }
 
-    async function registerToSchedule(docId) {
-        const studentId = JSON.parse(localStorage.getItem('user-info')).data.uid;
-        let result = await fetch(`/dashboard/${studentId}`, {
+    async function registerToSchedule(sessionId) {
+        const studentId = JSON.parse(localStorage.getItem('user-info')).id;
+        const accessToken = JSON.parse(localStorage.getItem('user-info')).access_token;
+        let result = await fetch(`${apiUrl}/session/api/student/bookSession/${uid}`, {
             method: 'POST',
             headers: {
                 "Content-Type": 'application/json',
-                "Accept": 'application/json'
+                "Accept": 'application/json',
+                "Authorization": accessToken
             },
+            credentials: 'include',
             body: JSON.stringify({
-                uidMentor: mentorDetail.uid,
-                docId: docId,
+                session_id: sessionId,
             })
         });
         result = await result.json();
-        console.log(result.message);
         if (result.success) {
             fetchMentorDetail()
             Swal.fire({
@@ -53,26 +55,35 @@ function MentorDetail() {
                 showConfirmButton: false,
                 timer: 1600
             })
-        } else if (result.message === "Kuota sudah habis") {
+        } else if (result.message === "quota has run out") {
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                title: 'Kuota Sudah Habis',
+                title: 'Quota Has Run Out',
+                showConfirmButton: false,
+                timer: 1600
+            })
+        } else if (result.message === "you already booked this sessions") {
+            Swal.fire({
+                position: 'center',
+                icon: 'warning',
+                title: 'You Already Booked This Session',
                 showConfirmButton: false,
                 timer: 1600
             })
         }
     }
+
     return (
         <div >
             <Header />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <h1 style={{marginBottom: '2rem'}}>Detail Mentor</h1>
+                <h1 style={{marginBottom: '2rem'}}>Mentor Detail</h1>
                 <div className="card" style={{ width: '18rem' }}>
                     <img className="card-img-top" src={mentorDetail.picture} alt="Card image cap" />
                     <div className="card-body">
-                        <h5 className="card-title">Nama: {mentorDetail.username}</h5>
-                        <p className="card-text">Bidang: {mentorDetail.bidang}</p>
+                        <h5 className="card-title">Nama: {mentorDetail.name}</h5>
+                        <p className="card-text">Bidang: {mentorDetail.field}</p>
                         <p className="card-text">Email: {mentorDetail.email}</p>
                         <p className="card-text">Phone: +{mentorDetail.phone}</p>
                     </div>
@@ -88,9 +99,8 @@ function MentorDetail() {
                         <div className="col-12 col-sm-6 col-md-4 col-lg-3 my-4">
                             <div className="card mx-auto" style={{ width: '18rem' }}>
                                 <div className="card-body">
-                                    <h5 className="card-title">Tanggal: {item.date}</h5>
-                                    <p className="card-text">Waktu: {item.time}</p>
-                                    <p className="card-text">Kuota: {item.kuota}</p>
+                                    <h5 className="card-title">{new Date(item.scheduleAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}</h5>
+                                    <p className="card-text">Quota: {item.quota}</p>
                                     <button onClick={(e) => registerToSchedule(item.id)} className='btn btn-success'>Daftar</button>
                                     <br />
                                 </div>

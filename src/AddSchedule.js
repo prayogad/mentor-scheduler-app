@@ -57,8 +57,11 @@ function AddSchedule() {
             body: JSON.stringify(item)
         });
         result = await result.json();
-        const message = result.message.map(value => value.message)
-        console.warn(message)
+        let message;
+        if (Array.isArray(result.message)) {
+            message = result.message.map(value => value.message)
+        }
+
         if (result.success) {
             fetchSchedule();
             Swal.fire({
