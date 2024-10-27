@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 function Protected(props) {
@@ -7,8 +7,7 @@ function Protected(props) {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     let Cmp = props.Cmp;
-    const location = useLocation();
-
+    
     const isTokenExpired = () => {
         const expirationTime = localStorage.getItem('expirationTime');
         if (!expirationTime) return true;

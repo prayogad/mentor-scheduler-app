@@ -2,7 +2,6 @@ import Header from "./Header"
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'
-import { InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 
 function AddSchedule() {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -149,7 +148,7 @@ function AddSchedule() {
             <Header />
             <br />
             <div className="align-items-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <h1>Ketersediaan Jadwal</h1>
+                <h1>Available Schedule</h1>
 
                 <input
                     value={date}
